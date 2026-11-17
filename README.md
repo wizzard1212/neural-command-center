@@ -4,7 +4,7 @@ Lokales Trading-Dashboard mit Morgen-Briefing, News-/Social-Feeds, Trading-Journ
 Funded-Konten-Übersicht und einem live aus dem Obsidian-Vault gespeisten 3D-„Gehirn".
 Basiert auf `SPEC.md` im Projektordner.
 
-**Aktueller Baustand:** Phase 2 (Gehirn + Obsidian live) – siehe Abschnitt „Phasenplan" unten.
+**Aktueller Baustand:** Phase 3 (Konten, manuell) – siehe Abschnitt „Phasenplan" unten.
 
 ## Installation
 
@@ -75,7 +75,9 @@ lauffähig:
 1. **Fundament** – Monorepo, Designsystem, Navigation, SQLite ✅
 2. **Gehirn + Obsidian live** – Vault-Parser, Live-Watcher (WebSocket, < 1s Latenz),
    3D-Gehirn mit Regionen/Farben, Hover/Klick-Panel, To-do-Satelliten, Filter ✅
-3. Konten (manuell)
+3. **Konten (manuell)** – Konto-Formular mit Vorlagen (The5ers, FTMO), Ampel &
+   Fortschrittsringe, Regel-Checkliste, Kopier-Risiko-Rechner, Auszahlungen mit
+   Netto-ROI, Account-Feed, eigene Ziele, Steuer-Export (CSV) ✅
 4. Trading-Journal
 5. News-Feed
 6. Morgen-Briefing

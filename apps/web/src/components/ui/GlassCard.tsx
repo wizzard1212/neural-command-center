@@ -5,9 +5,10 @@ export function GlassCard({
   children,
   className,
   title,
-}: PropsWithChildren<{ className?: string; title?: string }>) {
+  onClick,
+}: PropsWithChildren<{ className?: string; title?: string; onClick?: () => void }>) {
   return (
-    <div className={clsx("glass-card p-5", className)}>
+    <div className={clsx("glass-card p-5", className)} onClick={onClick}>
       {title && <h3 className="section-label mb-3">{title}</h3>}
       {children}
     </div>

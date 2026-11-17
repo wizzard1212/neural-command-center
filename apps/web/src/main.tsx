@@ -26,6 +26,12 @@ const router = createBrowserRouter([
       { path: "social", element: <SocialPage /> },
       { path: "journal", element: <JournalPage /> },
       { path: "konten", element: <KontenPage /> },
+      {
+        path: "konten/:id",
+        // lightweight-charts (Equity-Kurve) nur laden, wenn eine Kontodetailseite
+        // wirklich besucht wird.
+        lazy: () => import("./pages/AccountDetailPage").then((m) => ({ Component: m.AccountDetailPage })),
+      },
       { path: "kalender", element: <KalenderPage /> },
       { path: "statistik", element: <StatistikPage /> },
       { path: "einstellungen", element: <EinstellungenPage /> },

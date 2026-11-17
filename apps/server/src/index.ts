@@ -9,6 +9,7 @@ import { statusRoutes } from "./routes/status.js";
 import { settingsRoutes } from "./routes/settings.js";
 import { layoutRoutes } from "./routes/layout.js";
 import { vaultRoutes } from "./routes/vault.js";
+import { accountsRoutes } from "./routes/accounts.js";
 import { registerWs } from "./ws.js";
 import { startVaultWatcher } from "./vault/watcher.js";
 
@@ -27,6 +28,7 @@ await app.register(statusRoutes);
 await app.register(settingsRoutes);
 await app.register(layoutRoutes);
 await app.register(vaultRoutes);
+await app.register(accountsRoutes);
 await app.register(registerWs);
 
 // Server bindet bewusst nur an 127.0.0.1 (Sicherheitsvorgabe aus SPEC.md Abschnitt 2).

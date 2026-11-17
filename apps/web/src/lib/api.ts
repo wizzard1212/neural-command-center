@@ -35,3 +35,18 @@ export interface StatusResponse {
 export function fetchStatus() {
   return request<StatusResponse>("/status");
 }
+
+export async function fetchSetting<T>(key: string): Promise<T | null> {
+  const res = await fetch(`${API_BASE}/settings/${encodeURIComponent(key)}`);
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`API-Fehler ${res.status} bei /settings/${key}`);
+  const row = (await res.json()) as { key: string; value: T };
+  return row.value;
+}
+
+export function putSetting<T>(key: string, value: T) {
+  return request(`/settings/${encodeURIComponent(key)}`, {
+    method: "PUT",
+    body: JSON.stringify({ value }),
+  });
+}
