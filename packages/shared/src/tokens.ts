@@ -49,13 +49,21 @@ export const brainRegions: Record<
   dashboard_daten: { color: colorTokens.green, region: "impulse", folders: ["Dashboard"] },
 };
 
-export function resolveAreaForPath(path: string): AreaKey {
+export function resolveArea(path: string, tags: string[] = []): AreaKey {
+  const normalizedTags = tags.map((t) => t.replace(/^#/, "").toLowerCase());
   const normalized = path.replace(/\\/g, "/");
   const topFolder = normalized.split("/")[0] ?? "";
-  for (const [area, def] of Object.entries(brainRegions) as [AreaKey, typeof brainRegions[AreaKey]][]) {
+
+  for (const [area, def] of Object.entries(brainRegions) as [AreaKey, (typeof brainRegions)[AreaKey]][]) {
+    if (normalizedTags.includes(area)) return area;
+    if (def.folders.some((f) => normalizedTags.includes(f.toLowerCase()))) return area;
+  }
+
+  for (const [area, def] of Object.entries(brainRegions) as [AreaKey, (typeof brainRegions)[AreaKey]][]) {
     if (def.folders.some((f) => topFolder === f || topFolder.startsWith(`${f} `))) {
       return area;
     }
   }
+
   return "ideen_start";
 }

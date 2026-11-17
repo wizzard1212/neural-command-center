@@ -4,7 +4,7 @@ Lokales Trading-Dashboard mit Morgen-Briefing, News-/Social-Feeds, Trading-Journ
 Funded-Konten-Übersicht und einem live aus dem Obsidian-Vault gespeisten 3D-„Gehirn".
 Basiert auf `SPEC.md` im Projektordner.
 
-**Aktueller Baustand:** Phase 1 (Fundament) – siehe Abschnitt „Phasenplan" unten.
+**Aktueller Baustand:** Phase 2 (Gehirn + Obsidian live) – siehe Abschnitt „Phasenplan" unten.
 
 ## Installation
 
@@ -48,12 +48,13 @@ Netzwerk erreichbar.
 
 ## Datenbank
 
-SQLite-Datei unter `data/command-center.db` (wird automatisch beim ersten Start
-angelegt). Migrationen:
+SQLite-Datei unter `data/command-center.db`. Migrationen werden bei jedem
+Serverstart automatisch angewendet (kein manueller Schritt nötig). Nur nach
+einer Schema-Änderung im Code wird eine neue Migration gebraucht:
 
 ```bash
-pnpm db:generate   # Migration aus dem Schema erzeugen
-pnpm db:migrate    # Migration anwenden
+pnpm db:generate   # Migration aus dem Schema erzeugen (einmalig, als Entwickler)
+pnpm db:migrate    # Migration manuell anwenden (optional, passiert sonst automatisch)
 ```
 
 ## Fehlerbehebung
@@ -72,7 +73,8 @@ Gebaut wird in den 9 Phasen aus `SPEC.md` Abschnitt 12. Jede Phase ist für sich
 lauffähig:
 
 1. **Fundament** – Monorepo, Designsystem, Navigation, SQLite ✅
-2. Gehirn + Obsidian live
+2. **Gehirn + Obsidian live** – Vault-Parser, Live-Watcher (WebSocket, < 1s Latenz),
+   3D-Gehirn mit Regionen/Farben, Hover/Klick-Panel, To-do-Satelliten, Filter ✅
 3. Konten (manuell)
 4. Trading-Journal
 5. News-Feed
