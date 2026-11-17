@@ -4,7 +4,7 @@ Lokales Trading-Dashboard mit Morgen-Briefing, News-/Social-Feeds, Trading-Journ
 Funded-Konten-Übersicht und einem live aus dem Obsidian-Vault gespeisten 3D-„Gehirn".
 Basiert auf `SPEC.md` im Projektordner.
 
-**Aktueller Baustand:** Phase 3 (Konten, manuell) – siehe Abschnitt „Phasenplan" unten.
+**Aktueller Baustand:** Phase 4 (Trading-Journal) – siehe Abschnitt „Phasenplan" unten.
 
 ## Installation
 
@@ -78,7 +78,11 @@ lauffähig:
 3. **Konten (manuell)** – Konto-Formular mit Vorlagen (The5ers, FTMO), Ampel &
    Fortschrittsringe, Regel-Checkliste, Kopier-Risiko-Rechner, Auszahlungen mit
    Netto-ROI, Account-Feed, eigene Ziele, Steuer-Export (CSV) ✅
-4. Trading-Journal
+4. **Trading-Journal** – Setup-Erfassung mit Screenshot (Strg+V/Drag&Drop), live
+   berechnetem Positionsgrößen-Rechner, R:R und Risiko, Setup-Typ/Emotion-Tags,
+   Regel-Check, optionaler Claude-Vision-Screenshot-Analyse, Galerie-/Tabellen-
+   Ansicht mit Filtern, Kalender-Heatmap, Statistik (Winrate, Profit-Faktor,
+   Erwartungswert, Drawdown, Auswertung nach Setup/Session/Instrument/Emotion) ✅
 5. News-Feed
 6. Morgen-Briefing
 7. Social-Feed

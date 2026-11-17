@@ -10,10 +10,13 @@ import { settingsRoutes } from "./routes/settings.js";
 import { layoutRoutes } from "./routes/layout.js";
 import { vaultRoutes } from "./routes/vault.js";
 import { accountsRoutes } from "./routes/accounts.js";
+import { tradesRoutes } from "./routes/trades.js";
 import { registerWs } from "./ws.js";
 import { startVaultWatcher } from "./vault/watcher.js";
 
-const app = Fastify({ logger: true });
+// bodyLimit höher als Fastifys 1 MB-Standard, da Screenshots als Base64-JSON
+// hochgeladen werden (Abschnitt 9.1: Setup-Erfassung per Strg+V).
+const app = Fastify({ logger: true, bodyLimit: 15 * 1024 * 1024 });
 
 // Migrationen bei jedem Start automatisch anwenden, damit "pnpm dev" / start.bat
 // ohne manuellen Zwischenschritt funktioniert. drizzle-orm überspringt bereits
@@ -29,6 +32,7 @@ await app.register(settingsRoutes);
 await app.register(layoutRoutes);
 await app.register(vaultRoutes);
 await app.register(accountsRoutes);
+await app.register(tradesRoutes);
 await app.register(registerWs);
 
 // Server bindet bewusst nur an 127.0.0.1 (Sicherheitsvorgabe aus SPEC.md Abschnitt 2).
