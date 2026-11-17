@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background-color: #05070c;
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(0, 212, 255, 0.1), transparent 45%),
+    radial-gradient(circle at 85% 90%, rgba(168, 85, 247, 0.1), transparent 45%),
+    linear-gradient(
+      rgba(27, 39, 64, 0.3) 1px,
+      transparent 1px
+    );
+  background-size: 100% 100%, 100% 100%, 24px 24px;
+  color: #c9d6e8;
+  font-family: "Inter", sans-serif;
+  min-height: 100vh;
+}
+
+.font-heading {
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.font-mono-num {
+  font-family: "JetBrains Mono", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.glass-card {
+  background: rgba(10, 13, 22, 0.72);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(0, 212, 255, 0.14);
+  border-radius: 16px;
+  position: relative;
+}
+
+.glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(0, 212, 255, 0.8), transparent);
+  border-radius: 16px 16px 0 0;
+}
+
+.glass-card:hover {
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 0 24px rgba(0, 212, 255, 0.08);
+}
+
+.section-label {
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 11px;
+  color: #6b7a94;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
