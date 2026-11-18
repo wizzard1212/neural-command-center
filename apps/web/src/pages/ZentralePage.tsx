@@ -9,6 +9,9 @@ import { BriefingCard } from "../components/briefing/BriefingCard";
 import { BrainChat } from "../components/brainchat/BrainChat";
 import { fetchHypeRadar } from "../lib/socialApi";
 import { fetchCalendarEvents, fetchNoTradeWindows } from "../lib/calendarApi";
+import { fetchAccountsOverview } from "../lib/accountsApi";
+import { fetchSetting } from "../lib/api";
+import { TrafficLightDot } from "../components/accounts/TrafficLightDot";
 
 // three.js/@react-three/* sind der größte Teil des Bundles – nur laden, wenn
 // die Zentrale wirklich besucht wird, statt bei jedem Seitenaufruf.
@@ -46,6 +49,11 @@ export function ZentralePage() {
   });
   const { data: hypeRadar } = useQuery({ queryKey: ["social", "hype-radar"], queryFn: fetchHypeRadar });
   const { data: calendarEvents } = useQuery({ queryKey: ["calendar", "events"], queryFn: () => fetchCalendarEvents() });
+  const { data: accountsOverview } = useQuery({ queryKey: ["accounts", "overview"], queryFn: fetchAccountsOverview });
+  const { data: capitalGoal } = useQuery({
+    queryKey: ["settings", "managed_capital_goal_usd"],
+    queryFn: () => fetchSetting<number>("managed_capital_goal_usd"),
+  });
   const { data: noTrade } = useQuery({ queryKey: ["calendar", "no-trade-windows"], queryFn: fetchNoTradeWindows });
 
   const nextHighImpact = (calendarEvents ?? [])
@@ -92,7 +100,46 @@ export function ZentralePage() {
         </GlassCard>
 
         <GlassCard className="col-span-12 lg:col-span-4" title="Konten-Übersicht">
-          <p className="text-text-faint text-sm">Kommt in Phase 3 (Konten, Ampel, Ziel 1,1 Mio $).</p>
+          {!accountsOverview || accountsOverview.accountCount === 0 ? (
+            <p className="text-text-faint text-sm">Noch keine Konten angelegt.</p>
+          ) : (
+            (() => {
+              const goal = capitalGoal ?? 1_100_000;
+              const pct = goal > 0 ? Math.min(100, (accountsOverview.managedCapitalUsd / goal) * 100) : 0;
+              return (
+                <div className="flex flex-col gap-3">
+                  <div className="grid grid-cols-2 gap-3 font-mono-num text-sm">
+                    <div>
+                      <div className="text-text-faint text-xs">Summe Equity</div>
+                      <div className="text-text text-lg">{accountsOverview.totalEquity.toLocaleString("de-DE")} $</div>
+                    </div>
+                    <div>
+                      <div className="text-text-faint text-xs">Tages-P&L</div>
+                      <div className={accountsOverview.totalDailyPnl >= 0 ? "text-green text-lg" : "text-red text-lg"}>
+                        {accountsOverview.totalDailyPnl >= 0 ? "+" : ""}
+                        {accountsOverview.totalDailyPnl.toLocaleString("de-DE")} $
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-text-muted">
+                    <TrafficLightDot light={{ color: accountsOverview.worstLight, pulsing: false }} size="sm" />
+                    Risiko-Ampel: strengstes Konto {accountsOverview.worstLight}
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between text-xs text-text-faint mb-1">
+                      <span>Ziel: verwaltetes Kapital</span>
+                      <span className="font-mono-num">
+                        {accountsOverview.managedCapitalUsd.toLocaleString("de-DE")} / {goal.toLocaleString("de-DE")} $
+                      </span>
+                    </div>
+                    <div className="h-2 rounded-full bg-bg2 overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-cyan to-green" style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                </div>
+              );
+            })()
+          )}
         </GlassCard>
 
         <GlassCard className="col-span-12 lg:col-span-3" title="Heute wichtig">
