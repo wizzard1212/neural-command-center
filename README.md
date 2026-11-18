@@ -4,7 +4,7 @@ Lokales Trading-Dashboard mit Morgen-Briefing, News-/Social-Feeds, Trading-Journ
 Funded-Konten-Übersicht und einem live aus dem Obsidian-Vault gespeisten 3D-„Gehirn".
 Basiert auf `SPEC.md` im Projektordner.
 
-**Aktueller Baustand:** Phase 5 (News-Feed) – siehe Abschnitt „Phasenplan" unten.
+**Aktueller Baustand:** Phase 6 (Morgen-Briefing) – siehe Abschnitt „Phasenplan" unten.
 
 ## Installation
 
@@ -89,7 +89,15 @@ lauffähig:
    läuft automatisch sobald ein ANTHROPIC_API_KEY hinterlegt ist), 3-Spalten-
    Oberfläche mit Filtern, "Zusammenhang erklären" und "Als Content-Idee merken",
    KI-Kostenübersicht mit Monatsbudget in den Einstellungen ✅
-6. Morgen-Briefing
+6. **Morgen-Briefing** – Cron (Standard Mo–Fr 07:30 Europe/Berlin, in den Einstellungen
+   änderbar) + Button „Briefing jetzt erstellen", paralleles Einsammeln von Kursen
+   (FMP/CoinGecko), Wirtschaftskalender, COT-Daten, Konten-Puffer/Risiko, Merlins
+   eigenen Risiko-Regeln und offenen To-dos aus dem Vault (jede Quelle einzeln
+   fehlertolerant), Claude erstellt die 11 Abschnitte als erzwungenes JSON
+   (läuft automatisch sobald ein ANTHROPIC_API_KEY hinterlegt ist, sonst werden nur
+   die Rohdaten gespeichert), Speicherung in SQLite und als Vault-Notiz
+   (`Vault/Dashboard/Briefings/`), Windows-Benachrichtigung + optionaler
+   ntfy.sh-Push, kompakte Karte in der Zentrale mit Detail-Ansicht ✅
 7. Social-Feed
 8. Konten-Import (CSV/HTML-Export – MT5-Live-Anbindung bewusst nicht gebaut, da
    Variante C „manuell/Import" gewählt wurde)

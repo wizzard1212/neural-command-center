@@ -12,9 +12,11 @@ import { vaultRoutes } from "./routes/vault.js";
 import { accountsRoutes } from "./routes/accounts.js";
 import { tradesRoutes } from "./routes/trades.js";
 import { newsRoutes } from "./routes/news.js";
+import { briefingRoutes } from "./routes/briefing.js";
 import { registerWs } from "./ws.js";
 import { startVaultWatcher } from "./vault/watcher.js";
 import { startNewsScheduler } from "./news/scheduler.js";
+import { startBriefingScheduler } from "./briefing/scheduler.js";
 
 // bodyLimit höher als Fastifys 1 MB-Standard, da Screenshots als Base64-JSON
 // hochgeladen werden (Abschnitt 9.1: Setup-Erfassung per Strg+V).
@@ -36,6 +38,7 @@ await app.register(vaultRoutes);
 await app.register(accountsRoutes);
 await app.register(tradesRoutes);
 await app.register(newsRoutes);
+await app.register(briefingRoutes);
 await app.register(registerWs);
 
 // Server bindet bewusst nur an 127.0.0.1 (Sicherheitsvorgabe aus SPEC.md Abschnitt 2).
@@ -47,4 +50,5 @@ app.listen({ port: env.PORT, host: "127.0.0.1" }, (err, address) => {
   app.log.info(`Neural Command Center Server läuft auf ${address}`);
   startVaultWatcher(app.log);
   startNewsScheduler(app.log);
+  startBriefingScheduler();
 });

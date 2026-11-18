@@ -4,6 +4,7 @@ import { CheckSquare } from "lucide-react";
 import { GlassCard } from "../components/ui/GlassCard";
 import { FilterChips } from "../components/brain/FilterChips";
 import { NoteDetailPanel } from "../components/brain/NoteDetailPanel";
+import { BriefingCard } from "../components/briefing/BriefingCard";
 
 // three.js/@react-three/* sind der größte Teil des Bundles – nur laden, wenn
 // die Zentrale wirklich besucht wird, statt bei jedem Seitenaufruf.
@@ -76,7 +77,7 @@ export function ZentralePage() {
 
       <div className="grid grid-cols-12 gap-4">
         <GlassCard className="col-span-12 lg:col-span-5" title="Morgen-Briefing">
-          <p className="text-text-faint text-sm">Kommt in Phase 6 – täglich 07:30 Europe/Berlin.</p>
+          <BriefingCard />
         </GlassCard>
 
         <GlassCard className="col-span-12 lg:col-span-4" title="Konten-Übersicht">

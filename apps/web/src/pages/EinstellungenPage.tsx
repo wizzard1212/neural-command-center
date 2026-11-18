@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { fetchStatus, fetchAiUsageSummary } from "../lib/api";
 import { fetchNewsSources, toggleNewsSource, refreshNews } from "../lib/newsApi";
+import { fetchBriefingSchedule, updateBriefingSchedule, generateBriefing } from "../lib/briefingApi";
 import { GlassCard } from "../components/ui/GlassCard";
 import { useAppStore } from "../store/useAppStore";
 
@@ -31,8 +33,24 @@ export function EinstellungenPage() {
   const { data, refetch, isFetching } = useQuery({ queryKey: ["status"], queryFn: fetchStatus });
   const { data: sources } = useQuery({ queryKey: ["news", "sources"], queryFn: fetchNewsSources });
   const { data: aiUsage } = useQuery({ queryKey: ["ai-usage"], queryFn: fetchAiUsageSummary });
+  const { data: schedule } = useQuery({ queryKey: ["briefing", "schedule"], queryFn: fetchBriefingSchedule });
   const reducedAnimation = useAppStore((s) => s.reducedAnimation);
   const setReducedAnimation = useAppStore((s) => s.setReducedAnimation);
+
+  const [cronInput, setCronInput] = useState("");
+  useEffect(() => {
+    if (schedule) setCronInput(schedule.cron);
+  }, [schedule]);
+
+  const saveSchedule = useMutation({
+    mutationFn: (cron: string) => updateBriefingSchedule(cron),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["briefing", "schedule"] }),
+  });
+
+  const generateNow = useMutation({
+    mutationFn: generateBriefing,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["briefing"] }),
+  });
 
   const toggleSource = useMutation({
     mutationFn: ({ id, enabled }: { id: string; enabled: boolean }) => toggleNewsSource(id, enabled),
@@ -135,6 +153,39 @@ export function EinstellungenPage() {
             className="h-4 w-4 accent-cyan"
           />
         </label>
+      </GlassCard>
+
+      <GlassCard title="Morgen-Briefing">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-text-muted shrink-0">Cron (Europe/Berlin)</label>
+            <input
+              type="text"
+              value={cronInput}
+              onChange={(e) => setCronInput(e.target.value)}
+              className="flex-1 rounded-lg bg-bg2 border border-line px-3 py-1.5 text-sm font-mono-num text-text focus:outline-none focus:border-cyan/50"
+              placeholder="30 7 * * 1-5"
+            />
+            <button
+              onClick={() => saveSchedule.mutate(cronInput)}
+              disabled={saveSchedule.isPending || cronInput === schedule?.cron}
+              className="rounded-lg border border-cyan/30 px-3 py-1.5 text-xs text-cyan hover:bg-cyan/10 disabled:opacity-40"
+            >
+              Speichern
+            </button>
+          </div>
+          {saveSchedule.isError && (
+            <p className="text-xs text-red">{(saveSchedule.error as Error).message}</p>
+          )}
+          <p className="text-text-faint text-xs">Standard: Mo–Fr 07:30 Uhr („30 7 * * 1-5“).</p>
+          <button
+            onClick={() => generateNow.mutate()}
+            disabled={generateNow.isPending}
+            className="self-start rounded-lg border border-line px-3 py-1.5 text-xs text-text-muted hover:text-text hover:border-cyan/30 disabled:opacity-50"
+          >
+            {generateNow.isPending ? "Erstelle…" : "Briefing jetzt erstellen"}
+          </button>
+        </div>
       </GlassCard>
 
       <GlassCard title="KI-Kosten diesen Monat">

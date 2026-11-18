@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useVaultStore } from "../store/useVaultStore";
 import { useLiveStreamStore } from "../store/useLiveStreamStore";
+import { requestNotificationPermission, notify } from "./notify";
 
 const WS_URL = "ws://127.0.0.1:4000/ws";
 const RECONNECT_DELAY_MS = 2000;
@@ -16,6 +17,8 @@ export function useVaultWs() {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    requestNotificationPermission();
+
     let socket: WebSocket | null = null;
     let cancelled = false;
 
@@ -56,6 +59,7 @@ export function useVaultWs() {
             case "briefing:done": {
               queryClient.invalidateQueries({ queryKey: ["briefing"] });
               pushLiveStream({ kind: "briefing", label: "Morgen-Briefing fertig" });
+              notify("Morgen-Briefing fertig", "Das neue Briefing steht in der Zentrale bereit.");
               break;
             }
           }
