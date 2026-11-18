@@ -28,6 +28,26 @@ echo Starte Server und Oberflaeche ...
 start "Neural Command Center" cmd /k pnpm dev
 
 timeout /t 4 >nul
-start "" "http://localhost:5173"
+
+rem Chrome/Edge im App-Modus oeffnen (keine Adressleiste/Tabs, wirkt wie eine
+rem eigene Anwendung) statt im normalen Browser. Eigenes --user-data-dir,
+rem damit Fenstergroesse/-position gemerkt werden, ohne das normale
+rem Browserprofil (Logins, Verlauf) anzufassen. Faellt auf den
+rem Standardbrowser zurueck, wenn weder Chrome noch Edge gefunden wird.
+set "APP_URL=http://localhost:5173"
+set "APP_PROFILE=%~dp0data\browser-profile"
+set "CHROME_EXE="
+
+if exist "%ProgramFiles%\Google\Chrome\Application\chrome.exe" set "CHROME_EXE=%ProgramFiles%\Google\Chrome\Application\chrome.exe"
+if not defined CHROME_EXE if exist "%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe" set "CHROME_EXE=%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe"
+if not defined CHROME_EXE if exist "%LocalAppData%\Google\Chrome\Application\chrome.exe" set "CHROME_EXE=%LocalAppData%\Google\Chrome\Application\chrome.exe"
+if not defined CHROME_EXE if exist "%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe" set "CHROME_EXE=%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe"
+if not defined CHROME_EXE if exist "%ProgramFiles%\Microsoft\Edge\Application\msedge.exe" set "CHROME_EXE=%ProgramFiles%\Microsoft\Edge\Application\msedge.exe"
+
+if defined CHROME_EXE (
+  start "" "%CHROME_EXE%" --app=%APP_URL% --user-data-dir="%APP_PROFILE%" --window-size=1440,900
+) else (
+  start "" "%APP_URL%"
+)
 
 endlocal

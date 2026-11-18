@@ -42,10 +42,23 @@ pnpm dev
 
 Öffnet Server (`http://127.0.0.1:4000`) und Oberfläche (`http://127.0.0.1:5173`).
 Unter Windows reicht ein Doppelklick auf `start.bat` (kopiert beim ersten Mal
-`.env.example` nach `.env`, installiert Abhängigkeiten und öffnet den Browser).
+`.env.example` nach `.env`, installiert Abhängigkeiten und öffnet das Dashboard).
 
 Beide Serverteile binden bewusst nur an `127.0.0.1` – das Dashboard ist nie aus dem
 Netzwerk erreichbar.
+
+### Als "Desktop-App"
+
+`start.bat` öffnet Chrome oder Edge im App-Modus (`--app=...`, eigenes Profil
+unter `data/browser-profile/`) – kein Adressleiste/Tabs, sieht aus wie eine
+eigene Anwendung statt ein Browser-Tab. Ist keins von beiden installiert, öffnet
+sich stattdessen der Standardbrowser normal.
+
+Für ein Icon in der Taskleiste/im Startmenü: Rechtsklick auf `start.bat` →
+"Verknüpfung erstellen", die Verknüpfung an die Taskleiste anheften oder in den
+Ordner `shell:startup` legen (Windows-Autostart). Ein eigenes `.exe` (Electron/
+Tauri) wäre ebenfalls möglich, ist aber deutlich aufwendiger und bringt für ein
+Dashboard, das sowieso nur lokal läuft, keinen echten Zusatznutzen.
 
 ## Datenbank
 
