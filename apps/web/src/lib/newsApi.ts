@@ -76,3 +76,13 @@ export const saveContentIdea = (newsId: number, hookDe?: string, hookEn?: string
 export const explainNews = (newsId: number) =>
   request<{ explanation: string }>(`/news/${newsId}/explain`, { method: "POST" });
 export const fetchContentIdeas = () => request<ContentIdea[]>("/content-ideas");
+
+export interface ScriptDraft {
+  topic: string;
+  title: string;
+  script: string;
+  vaultPath: string | null;
+}
+
+export const generateScriptForToday = () =>
+  request<ScriptDraft>("/content-ideas/script-for-today", { method: "POST" });

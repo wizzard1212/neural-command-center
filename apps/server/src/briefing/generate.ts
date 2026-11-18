@@ -12,26 +12,13 @@ import { collectWatchlistPrices, collectEconomicCalendar, collectCotData } from 
 import { collectRiskRulesFromVault, collectOpenTradingTodos } from "./vaultRules.js";
 import { collectAccountsToday } from "./accountsCollector.js";
 import { collectSocialTrends } from "./socialCollector.js";
+import { sendNtfyPush } from "../lib/ntfy.js";
 import { BRIEFING_TOOL, type BriefingNarrative } from "./schema.js";
 import { createBriefing } from "./repo.js";
 import { broadcast } from "../ws.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SYSTEM_PROMPT = readFileSync(resolve(__dirname, "../prompts/briefing.md"), "utf-8");
-
-async function sendNtfyPush(title: string, message: string) {
-  if (!env.NTFY_TOPIC) return;
-  try {
-    await fetch(`https://ntfy.sh/${env.NTFY_TOPIC}`, {
-      method: "POST",
-      headers: { Title: title },
-      body: message,
-      signal: AbortSignal.timeout(10_000),
-    });
-  } catch {
-    // Push ist ein Komfort-Feature – ein Fehler hier darf das Briefing nicht scheitern lassen.
-  }
-}
 
 function writeBriefingMarkdown(date: string, markdown: string): string | null {
   if (!env.VAULT_PATH || !existsSync(env.VAULT_PATH)) return null;

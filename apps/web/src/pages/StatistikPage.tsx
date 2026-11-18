@@ -1,8 +1,11 @@
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { RefreshCw, Sparkles } from "lucide-react";
 import { winRatePct, profitFactor, averageR, expectancyR, maxDrawdownR, longestStreak, groupStats } from "@ncc/shared";
 import { GlassCard } from "../components/ui/GlassCard";
 import { fetchTrades, type Trade } from "../lib/journalApi";
+import { listReviews, generateReview } from "../lib/reviewApi";
+import { PredictionLogCard } from "../components/predictions/PredictionLogCard";
 
 const SESSION_LABELS: Record<string, string> = {
   asia: "Asien",
@@ -83,6 +86,87 @@ function EquityCurveR({ trades }: { trades: Trade[] }) {
   );
 }
 
+function WeeklyReviewCard() {
+  const queryClient = useQueryClient();
+  const { data: reviews } = useQuery({ queryKey: ["reviews"], queryFn: listReviews });
+
+  const generate = useMutation({
+    mutationFn: generateReview,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["reviews"] }),
+  });
+
+  const latest = reviews?.[0];
+  const narrative = latest?.contentJson?.narrative ?? null;
+  const stats = latest?.contentJson?.stats;
+
+  return (
+    <GlassCard title="Wochen-Review">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-text-faint text-xs">
+          Automatisch jeden Sonntag 18:00 Uhr{latest ? ` · zuletzt: ${latest.week}` : ""}
+        </span>
+        <button
+          onClick={() => generate.mutate()}
+          disabled={generate.isPending}
+          className="flex items-center gap-1.5 rounded-lg border border-cyan/30 px-3 py-1.5 text-xs text-cyan hover:bg-cyan/10 disabled:opacity-50"
+        >
+          <RefreshCw size={12} className={generate.isPending ? "animate-spin" : ""} />
+          {generate.isPending ? "Erstellt…" : "Review jetzt erstellen"}
+        </button>
+      </div>
+
+      {!latest ? (
+        <p className="text-text-faint text-sm">Noch kein Wochen-Review erstellt.</p>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {stats && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono-num text-sm">
+              <div>
+                <div className="text-text-faint text-xs">Trades</div>
+                <div className="text-text">{stats.tradeCount}</div>
+              </div>
+              <div>
+                <div className="text-text-faint text-xs">Ergebnis</div>
+                <div className={stats.totalResultR >= 0 ? "text-green" : "text-red"}>{stats.totalResultR.toFixed(2)}R</div>
+              </div>
+              <div>
+                <div className="text-text-faint text-xs">Regelbrüche</div>
+                <div className={stats.ruleBreaches > 0 ? "text-red" : "text-text"}>{stats.ruleBreaches}</div>
+              </div>
+              <div>
+                <div className="text-text-faint text-xs">Serien (G/V)</div>
+                <div className="text-text">
+                  {stats.longestWinStreak}/{stats.longestLossStreak}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {narrative ? (
+            <>
+              <p className="text-sm text-text">{narrative.zusammenfassungDe}</p>
+              {narrative.verbesserungen.length > 0 && (
+                <div>
+                  <h4 className="section-label mb-1.5 flex items-center gap-1.5">
+                    <Sparkles size={11} /> 3 Verbesserungen
+                  </h4>
+                  <ol className="list-decimal list-inside text-sm text-text-muted flex flex-col gap-0.5">
+                    {narrative.verbesserungen.map((v, i) => (
+                      <li key={i}>{v}</li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="text-text-faint text-sm">Kein KI-Fließtext verfügbar (ANTHROPIC_API_KEY fehlt oder Monatsbudget erreicht).</p>
+          )}
+        </div>
+      )}
+    </GlassCard>
+  );
+}
+
 export function StatistikPage() {
   const { data: tradesData } = useQuery({ queryKey: ["trades"], queryFn: fetchTrades });
   const [breakdown, setBreakdown] = useState<BreakdownKey>("setup");
@@ -100,6 +184,8 @@ export function StatistikPage() {
     return (
       <div className="flex flex-col gap-4">
         <h1 className="font-heading text-xl text-text">Statistik & Wochen-Review</h1>
+        <WeeklyReviewCard />
+        <PredictionLogCard />
         <GlassCard className="text-center py-10">
           <p className="text-text-faint text-sm">
             Noch keine Trades im Journal. Statistiken erscheinen, sobald du Setups erfasst.
@@ -112,6 +198,8 @@ export function StatistikPage() {
   return (
     <div className="flex flex-col gap-4">
       <h1 className="font-heading text-xl text-text">Statistik & Wochen-Review</h1>
+      <WeeklyReviewCard />
+      <PredictionLogCard />
 
       <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-3">
         <StatCard label="Winrate" value={winRatePct(closedTrades) !== null ? `${winRatePct(closedTrades)!.toFixed(0)}%` : "–"} />

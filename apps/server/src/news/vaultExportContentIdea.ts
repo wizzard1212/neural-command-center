@@ -35,3 +35,23 @@ export function writeContentIdeaMarkdown(input: {
 
   return `${vaultRelativeDir}/${fileName}`;
 }
+
+/** Abschnitt 11: "News-Kanal-Brücke ... Skript für heute ... speichert in
+ * Vault/Dashboard/Content-Ideen/." Eigene Funktion statt writeContentIdeaMarkdown
+ * wiederzuverwenden, damit die Überschrift ("Skript", nicht "Hook") stimmt. */
+export function writeScriptMarkdown(input: { topic: string; title: string; script: string }): string | null {
+  if (!env.VAULT_PATH || !existsSync(env.VAULT_PATH)) return null;
+
+  const dateStr = new Date().toISOString().slice(0, 10);
+  const vaultRelativeDir = `${env.VAULT_WRITE_DIR}/Content-Ideen`;
+  const absoluteDir = resolve(env.VAULT_PATH, vaultRelativeDir);
+  mkdirSync(absoluteDir, { recursive: true });
+
+  const fileName = sanitizeFilename(`${dateStr} Skript ${input.topic} - ${input.title}.md`) || `${dateStr} Skript.md`;
+  const content = matter.stringify([`# ${input.title}`, "", `## Skript (${input.topic})`, input.script, ""].join("\n"), {
+    tags: ["content-idee", "skript"],
+  });
+  writeFileSync(resolve(absoluteDir, fileName), content, "utf-8");
+
+  return `${vaultRelativeDir}/${fileName}`;
+}

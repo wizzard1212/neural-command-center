@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { fetchStatus, fetchAiUsageSummary } from "../lib/api";
 import { fetchNewsSources, toggleNewsSource, refreshNews } from "../lib/newsApi";
 import { fetchBriefingSchedule, updateBriefingSchedule, generateBriefing } from "../lib/briefingApi";
+import { fetchBackups, runBackupNow } from "../lib/backupApi";
 import { GlassCard } from "../components/ui/GlassCard";
 import { useAppStore } from "../store/useAppStore";
 
@@ -50,6 +51,12 @@ export function EinstellungenPage() {
   const generateNow = useMutation({
     mutationFn: generateBriefing,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["briefing"] }),
+  });
+
+  const { data: backups } = useQuery({ queryKey: ["backups"], queryFn: fetchBackups });
+  const runBackup = useMutation({
+    mutationFn: runBackupNow,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["backups"] }),
   });
 
   const toggleSource = useMutation({
@@ -184,6 +191,24 @@ export function EinstellungenPage() {
             className="self-start rounded-lg border border-line px-3 py-1.5 text-xs text-text-muted hover:text-text hover:border-cyan/30 disabled:opacity-50"
           >
             {generateNow.isPending ? "Erstelle…" : "Briefing jetzt erstellen"}
+          </button>
+        </div>
+      </GlassCard>
+
+      <GlassCard title="Backups">
+        <div className="flex items-center justify-between">
+          <p className="text-text-faint text-sm">
+            {backups && backups.length > 0
+              ? `${backups.length} Backup(s), zuletzt ${timeAgo(backups[0].createdAt)}`
+              : "Noch kein Backup erstellt."}
+            {" "}· täglich 03:00 Uhr, letzte 14 werden behalten.
+          </p>
+          <button
+            onClick={() => runBackup.mutate()}
+            disabled={runBackup.isPending}
+            className="shrink-0 rounded-lg border border-cyan/30 px-3 py-1.5 text-xs text-cyan hover:bg-cyan/10 disabled:opacity-50"
+          >
+            {runBackup.isPending ? "Sichert…" : "Jetzt sichern"}
           </button>
         </div>
       </GlassCard>

@@ -10,15 +10,28 @@ import { JournalFilters, EMPTY_FILTERS, type JournalFilterState } from "../compo
 import { CalendarHeatmap } from "../components/journal/CalendarHeatmap";
 import { fetchTrades, type Trade, type TradeImage } from "../lib/journalApi";
 import { fetchAccounts } from "../lib/accountsApi";
+import { useAppStore } from "../store/useAppStore";
 
 export function JournalPage() {
   const [view, setView] = useState<"gallery" | "table">("gallery");
   const [filters, setFilters] = useState<JournalFilterState>(EMPTY_FILTERS);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<{ trade: Trade; images: TradeImage[] } | null>(null);
+  const pendingQuickTrade = useAppStore((s) => s.pendingQuickTrade);
+  const consumeQuickTrade = useAppStore((s) => s.consumeQuickTrade);
 
   const { data: tradesData } = useQuery({ queryKey: ["trades"], queryFn: fetchTrades });
   const { data: accountsData } = useQuery({ queryKey: ["accounts"], queryFn: fetchAccounts });
+
+  // Abschnitt 11: Command-Palette "Trade anlegen" navigiert hierher und setzt
+  // dieses Flag, statt die Journal-Seite direkt zu koppeln.
+  useEffect(() => {
+    if (pendingQuickTrade) {
+      setEditing(null);
+      setFormOpen(true);
+      consumeQuickTrade();
+    }
+  }, [pendingQuickTrade, consumeQuickTrade]);
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {

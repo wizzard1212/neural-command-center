@@ -1,11 +1,14 @@
 import { lazy, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
+import clsx from "clsx";
 import { CheckSquare } from "lucide-react";
 import { GlassCard } from "../components/ui/GlassCard";
 import { FilterChips } from "../components/brain/FilterChips";
 import { NoteDetailPanel } from "../components/brain/NoteDetailPanel";
 import { BriefingCard } from "../components/briefing/BriefingCard";
+import { BrainChat } from "../components/brainchat/BrainChat";
 import { fetchHypeRadar } from "../lib/socialApi";
+import { fetchCalendarEvents, fetchNoTradeWindows } from "../lib/calendarApi";
 
 // three.js/@react-three/* sind der größte Teil des Bundles – nur laden, wenn
 // die Zentrale wirklich besucht wird, statt bei jedem Seitenaufruf.
@@ -42,6 +45,12 @@ export function ZentralePage() {
     enabled: meta?.connected ?? false,
   });
   const { data: hypeRadar } = useQuery({ queryKey: ["social", "hype-radar"], queryFn: fetchHypeRadar });
+  const { data: calendarEvents } = useQuery({ queryKey: ["calendar", "events"], queryFn: () => fetchCalendarEvents() });
+  const { data: noTrade } = useQuery({ queryKey: ["calendar", "no-trade-windows"], queryFn: fetchNoTradeWindows });
+
+  const nextHighImpact = (calendarEvents ?? [])
+    .filter((e) => e.impact === "high" && new Date(e.ts).getTime() > Date.now())
+    .slice(0, 3);
 
   const openTodoNodes = (graph?.nodes ?? [])
     .filter((n) => n.todosOpen > 0)
@@ -87,7 +96,30 @@ export function ZentralePage() {
         </GlassCard>
 
         <GlassCard className="col-span-12 lg:col-span-3" title="Heute wichtig">
-          <p className="text-text-faint text-sm">Kommt in Phase 9 (Kalender & Kein-Trade-Fenster).</p>
+          {nextHighImpact.length === 0 ? (
+            <p className="text-text-faint text-sm">Keine High-Impact-Termine geladen.</p>
+          ) : (
+            <ul className="flex flex-col gap-1.5">
+              {nextHighImpact.map((e) => (
+                <li key={e.id} className="text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-text truncate">{e.title}</span>
+                    <span className="text-text-faint text-xs font-mono-num shrink-0">
+                      {new Date(e.ts).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                  </div>
+                  <span className="text-text-faint text-xs">{e.country}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+          {noTrade?.countdown.next && (
+            <p className={clsx("text-xs mt-2 pt-2 border-t border-line", noTrade.countdown.activeNow ? "text-red" : "text-orange")}>
+              {noTrade.countdown.activeNow
+                ? `Kein-Trade-Fenster aktiv: ${noTrade.countdown.next.eventTitle}`
+                : `Nächstes Kein-Trade-Fenster in ${noTrade.countdown.minutesUntilNext} min`}
+            </p>
+          )}
         </GlassCard>
 
         <GlassCard className="col-span-12 lg:col-span-4" title="Top-Trends">
@@ -157,6 +189,8 @@ export function ZentralePage() {
           )}
         </GlassCard>
       </div>
+
+      <BrainChat />
     </div>
   );
 }

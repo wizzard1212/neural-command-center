@@ -4,7 +4,8 @@ Lokales Trading-Dashboard mit Morgen-Briefing, News-/Social-Feeds, Trading-Journ
 Funded-Konten-Übersicht und einem live aus dem Obsidian-Vault gespeisten 3D-„Gehirn".
 Basiert auf `SPEC.md` im Projektordner.
 
-**Aktueller Baustand:** Phase 8 (Konten-Import) – siehe Abschnitt „Phasenplan" unten.
+**Aktueller Baustand:** Phase 9 (Extras) – alle 9 Phasen aus SPEC.md Abschnitt 12
+sind gebaut. Siehe Abschnitt „Phasenplan" unten.
 
 ## Installation
 
@@ -115,7 +116,30 @@ lauffähig:
    Kopfzeile erkannt (Deutsch und Englisch), Ein-/Auszahlungen zählen nicht
    als Trading-P&L, bereits vorhandene Tage werden übersprungen, unbekanntes
    Format liefert eine klare Fehlermeldung statt falscher Daten ✅
-9. Extras (Kalender, Wochen-Review, „Frag dein Gehirn", Backups)
+9. **Extras** ✅
+   - **Kalender & Kein-Trade-Fenster**: Wirtschaftskalender (FMP, 7 Tage) farbig
+     nach Impact, automatisch berechnete Kein-Trade-Fenster aus High-Impact-
+     Terminen + der News-Regel jedes Kontos, Countdown + Risiko-Ampel in der
+     Statusleiste (vorher unverdrahtete Platzhalter aus Phase 1), ntfy-Push
+     10 Minuten vorher
+   - **Wochen-Review**: automatisch Sonntag 18:00, Claude fasst Zahlen, Muster,
+     Regelbrüche und 3 konkrete Verbesserungen zusammen, Vault-Export + Push
+   - **„Frag dein Gehirn“**: Chat auf der Zentrale, einfache Volltextsuche über
+     den Vault (Titel- und Inhaltstreffer gewichtet) + Konten-/Journal-/
+     Briefing-Daten als Kontext, nennt die genutzten Notizen als Quelle
+   - **Prognose-Logbuch**: eigene Prognosen oder Einschätzungen direkt aus dem
+     Morgen-Briefing merken, als eingetroffen/nicht eingetroffen markieren,
+     Trefferquote
+   - **Backups**: täglich 03:00 Uhr über better-sqlite3s Online-Backup-API
+     (kein roher Dateikopiervorgang, daher nie beschädigt bei WAL-Schreib-
+     zugriff), letzte 14 behalten, Status + manueller Trigger in den
+     Einstellungen
+   - **Command-Palette** (Strg+K): Notiz suchen, Trade anlegen, Briefing neu
+     erstellen, zu jeder Leiste springen
+   - **News-Kanal-Brücke**: Button „Skript für heute“ erzeugt aus Briefing +
+     gemerkten Content-Ideen einen Skript-Entwurf passend zum Wochenplan-Thema
+     des Kanals, Vault-Export
+   - Claude Vision im Journal bereits seit Phase 4 vorhanden
 
 ## Entscheidungen (Stand: Projektstart)
 

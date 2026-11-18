@@ -102,7 +102,10 @@ export interface GenerateBriefingResult {
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
-    headers: { "Content-Type": "application/json" },
+    // Nur mit Content-Type: application/json senden, wenn tatsächlich ein Body
+    // existiert – sonst lehnt Fastifys Body-Parser leere POST-Requests ab
+    // (z. B. "Jetzt erstellen" ohne Body).
+    headers: init?.body ? { "Content-Type": "application/json" } : undefined,
     ...init,
   });
   if (!res.ok) throw new Error(`API-Fehler ${res.status} bei ${path}`);

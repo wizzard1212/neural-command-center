@@ -14,11 +14,19 @@ import { tradesRoutes } from "./routes/trades.js";
 import { newsRoutes } from "./routes/news.js";
 import { briefingRoutes } from "./routes/briefing.js";
 import { socialRoutes } from "./routes/social.js";
+import { calendarRoutes } from "./routes/calendar.js";
+import { reviewsRoutes } from "./routes/reviews.js";
+import { brainRoutes } from "./routes/brain.js";
+import { predictionsRoutes } from "./routes/predictions.js";
+import { backupsRoutes } from "./routes/backups.js";
+import { startBackupScheduler } from "./lib/backupScheduler.js";
 import { registerWs } from "./ws.js";
 import { startVaultWatcher } from "./vault/watcher.js";
 import { startNewsScheduler } from "./news/scheduler.js";
 import { startBriefingScheduler } from "./briefing/scheduler.js";
 import { startSocialScheduler } from "./social/scheduler.js";
+import { startCalendarScheduler } from "./calendar/scheduler.js";
+import { startReviewScheduler } from "./journal/reviewScheduler.js";
 
 // bodyLimit höher als Fastifys 1 MB-Standard, da Screenshots als Base64-JSON
 // hochgeladen werden (Abschnitt 9.1: Setup-Erfassung per Strg+V).
@@ -55,6 +63,11 @@ await app.register(tradesRoutes);
 await app.register(newsRoutes);
 await app.register(briefingRoutes);
 await app.register(socialRoutes);
+await app.register(calendarRoutes);
+await app.register(reviewsRoutes);
+await app.register(brainRoutes);
+await app.register(predictionsRoutes);
+await app.register(backupsRoutes);
 await app.register(registerWs);
 
 // Server bindet bewusst nur an 127.0.0.1 (Sicherheitsvorgabe aus SPEC.md Abschnitt 2).
@@ -68,4 +81,7 @@ app.listen({ port: env.PORT, host: "127.0.0.1" }, (err, address) => {
   startNewsScheduler(app.log);
   startBriefingScheduler();
   startSocialScheduler(app.log);
+  startCalendarScheduler(app.log);
+  startReviewScheduler();
+  startBackupScheduler(app.log);
 });

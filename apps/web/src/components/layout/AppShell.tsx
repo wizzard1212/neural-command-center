@@ -3,6 +3,7 @@ import { IconRail } from "./IconRail";
 import { StatusBar } from "./StatusBar";
 import { LiveStreamSidebar } from "./LiveStreamSidebar";
 import { useVaultWs } from "../../lib/useVaultWs";
+import { CommandPalette } from "../commandpalette/CommandPalette";
 
 export function AppShell() {
   useVaultWs();
@@ -17,6 +18,7 @@ export function AppShell() {
         </main>
       </div>
       <LiveStreamSidebar />
+      <CommandPalette />
     </div>
   );
 }

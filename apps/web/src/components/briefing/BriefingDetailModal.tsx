@@ -1,10 +1,26 @@
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { X, ExternalLink } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { X, ExternalLink, BookmarkPlus, Check } from "lucide-react";
 import clsx from "clsx";
 import type { Briefing } from "../../lib/briefingApi";
 import { BIAS_LABEL, BIAS_CLASS } from "./biasStyle";
 import { TrafficLightDot } from "../accounts/TrafficLightDot";
+import { createPrediction } from "../../lib/predictionsApi";
+
+function RememberPredictionButton({ asset, text }: { asset: string; text: string }) {
+  const mutation = useMutation({ mutationFn: () => createPrediction({ text, asset }) });
+  return (
+    <button
+      onClick={() => mutation.mutate()}
+      disabled={mutation.isPending || mutation.isSuccess}
+      className="flex items-center gap-1 text-[11px] text-text-faint hover:text-cyan disabled:text-green"
+    >
+      {mutation.isSuccess ? <Check size={11} /> : <BookmarkPlus size={11} />}
+      {mutation.isSuccess ? "Als Prognose gemerkt" : "Als Prognose merken"}
+    </button>
+  );
+}
 
 function Section({ n, title, children }: { n: number; title: string; children: ReactNode }) {
   return (
@@ -67,6 +83,12 @@ export function BriefingDetailModal({ briefing, onClose }: { briefing: Briefing;
                       </div>
                       <p className="text-text-muted text-xs">{w.zonen}</p>
                       <p className="text-text-faint text-xs">{w.treiber}</p>
+                      <div className="mt-1">
+                        <RememberPredictionButton
+                          asset={w.instrument}
+                          text={`${BIAS_LABEL[w.bias]}: ${w.zonen} – ${w.treiber}`}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>

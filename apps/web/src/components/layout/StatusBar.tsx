@@ -2,7 +2,18 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import clsx from "clsx";
 import { fetchStatus } from "../../lib/api";
+import { fetchAccountsOverview } from "../../lib/accountsApi";
+import { fetchNoTradeWindows } from "../../lib/calendarApi";
 import { DEFAULT_WATCHLIST } from "@ncc/shared";
+
+const RISK_COLOR_CLASS: Record<string, string> = { green: "bg-green", yellow: "bg-orange", red: "bg-red" };
+
+function formatCountdown(minutes: number): string {
+  if (minutes < 60) return `${minutes} min`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${h}h ${m}min`;
+}
 
 function useClock() {
   const [now, setNow] = useState(() => new Date());
@@ -37,6 +48,16 @@ export function StatusBar() {
     queryFn: fetchStatus,
     refetchInterval: 15_000,
   });
+  const { data: overview } = useQuery({
+    queryKey: ["accounts", "overview"],
+    queryFn: fetchAccountsOverview,
+    refetchInterval: 30_000,
+  });
+  const { data: noTrade } = useQuery({
+    queryKey: ["calendar", "no-trade-windows"],
+    queryFn: fetchNoTradeWindows,
+    refetchInterval: 60_000,
+  });
 
   return (
     <header className="h-14 shrink-0 border-b border-line bg-bg1 flex items-center justify-between px-5 gap-6 text-sm">
@@ -68,13 +89,31 @@ export function StatusBar() {
         ))}
       </div>
 
-      <div className="flex items-center gap-1.5" title="Risiko-Ampel gesamt (ab Phase 3)">
-        <span className="h-2.5 w-2.5 rounded-full border border-text-faint" />
-        <span className="text-xs text-text-faint hidden md:inline">Risiko –</span>
+      <div className="flex items-center gap-1.5" title="Risiko-Ampel gesamt über alle Konten">
+        <span
+          className={clsx(
+            "h-2.5 w-2.5 rounded-full",
+            overview ? RISK_COLOR_CLASS[overview.worstLight] : "border border-text-faint",
+          )}
+        />
+        <span className="text-xs text-text-faint hidden md:inline">
+          {overview && overview.accountCount > 0 ? "Risiko OK" : "Risiko –"}
+        </span>
       </div>
 
-      <div className="hidden md:flex items-center gap-1.5 text-xs text-text-faint" title="Nächster High-Impact-Termin (ab Phase 10)">
-        Termin –
+      <div
+        className={clsx("hidden md:flex items-center gap-1.5 text-xs", noTrade?.countdown.activeNow ? "text-red" : "text-text-faint")}
+        title={
+          noTrade?.countdown.next
+            ? `${noTrade.countdown.next.eventTitle} (${noTrade.countdown.next.country}) – ${noTrade.countdown.next.accountLabel}`
+            : "Kein anstehendes Kein-Trade-Fenster"
+        }
+      >
+        {noTrade?.countdown.activeNow
+          ? "Kein-Trade-Fenster aktiv"
+          : noTrade?.countdown.minutesUntilNext != null
+            ? `Termin in ${formatCountdown(noTrade.countdown.minutesUntilNext)}`
+            : "Termin –"}
       </div>
 
       <div className="flex items-center gap-2.5">
