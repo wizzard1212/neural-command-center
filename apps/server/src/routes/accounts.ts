@@ -4,6 +4,7 @@ import { computeAccountSummary, type AccountRuleConfig } from "../accounts/summa
 import { copyRiskCalculator } from "../accounts/risk.js";
 import { costsAndRoi } from "../accounts/risk.js";
 import { ACCOUNT_TEMPLATES } from "../accounts/templates.js";
+import { parseCsvStatement, parseHtmlStatement } from "../accounts/importParser.js";
 import { broadcast } from "../ws.js";
 
 type AccountRow = ReturnType<typeof repo.getAccount>;
@@ -148,6 +149,55 @@ export async function accountsRoutes(app: FastifyInstance) {
   );
 
   app.get<{ Params: { id: string } }>("/accounts/:id/snapshots", async (req) => repo.listSnapshots(Number(req.params.id)));
+
+  // Abschnitt 8.4, Variante C: MT5-Kontoauszug (HTML- oder CSV-Export)
+  // importieren, statt jeden Tag manuell einzutragen. Datei wird im Browser
+  // gelesen und als Text gesendet (wie Screenshots in Phase 4) statt über
+  // Multipart-Upload, um keine zusätzliche Abhängigkeit zu brauchen.
+  app.post<{ Params: { id: string }; Body: { format: "html" | "csv"; content: string } }>(
+    "/accounts/:id/import",
+    async (req, reply) => {
+      const id = Number(req.params.id);
+      const account = repo.getAccount(id);
+      if (!account) return reply.code(404).send({ error: "not_found" });
+
+      const { format, content } = req.body;
+      const result = format === "html" ? parseHtmlStatement(content) : parseCsvStatement(content);
+      if (!result.ok) {
+        return reply.code(422).send({ error: "parse_failed", message: result.reason });
+      }
+
+      const existingDates = new Set(repo.listSnapshots(id).map((s) => s.ts.slice(0, 10)));
+      let imported = 0;
+      for (const day of result.days) {
+        if (existingDates.has(day.date)) continue;
+        repo.addSnapshot(id, {
+          ts: `${day.date}T23:59:59.000Z`,
+          balance: day.balance,
+          equity: day.balance,
+          dailyPnl: day.dailyPnl,
+          source: "import",
+        });
+        imported++;
+      }
+      const skipped = result.days.length - imported;
+
+      if (imported > 0) {
+        repo.addEvent({
+          accountId: id,
+          type: "import",
+          text: `Kontoauszug importiert: ${imported} Tag(e) übernommen${skipped > 0 ? `, ${skipped} bereits vorhanden übersprungen` : ""}.`,
+        });
+      }
+
+      return reply.code(201).send({
+        imported,
+        skipped,
+        from: result.days[0]?.date ?? null,
+        to: result.days.at(-1)?.date ?? null,
+      });
+    },
+  );
 
   app.post<{
     Params: { id: string };

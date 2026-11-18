@@ -4,7 +4,7 @@ Lokales Trading-Dashboard mit Morgen-Briefing, News-/Social-Feeds, Trading-Journ
 Funded-Konten-Übersicht und einem live aus dem Obsidian-Vault gespeisten 3D-„Gehirn".
 Basiert auf `SPEC.md` im Projektordner.
 
-**Aktueller Baustand:** Phase 7 (Social-Feed) – siehe Abschnitt „Phasenplan" unten.
+**Aktueller Baustand:** Phase 8 (Konten-Import) – siehe Abschnitt „Phasenplan" unten.
 
 ## Installation
 
@@ -107,8 +107,14 @@ lauffähig:
    Watchlist als Halbkreis-Gauges mit Extremwert-Warnung, Plattform-Kacheln
    mit Mini-Feed, KI-Hook-Idee-Generator + "Als Content-Idee merken" wie in
    Phase 5, Social-Trends fließen zusätzlich ins Morgen-Briefing (Phase 6) ✅
-8. Konten-Import (CSV/HTML-Export – MT5-Live-Anbindung bewusst nicht gebaut, da
-   Variante C „manuell/Import" gewählt wurde)
+8. **Konten-Import** – MT5-Live-Anbindung bewusst nicht gebaut (Variante C
+   „manuell/Import" aus Sicherheitsgründen gewählt). Tägliche Stände lassen
+   sich seit Phase 3 manuell erfassen; neu: MT5-Kontoauszug (HTML- oder
+   CSV-Export der Konto-Historie) auf der Kontodetailseite hochladen und in
+   einem Rutsch als Tages-Stände importieren. Spalten werden über die
+   Kopfzeile erkannt (Deutsch und Englisch), Ein-/Auszahlungen zählen nicht
+   als Trading-P&L, bereits vorhandene Tage werden übersprungen, unbekanntes
+   Format liefert eine klare Fehlermeldung statt falscher Daten ✅
 9. Extras (Kalender, Wochen-Review, „Frag dein Gehirn", Backups)
 
 ## Entscheidungen (Stand: Projektstart)

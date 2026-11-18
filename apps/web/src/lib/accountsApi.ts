@@ -111,7 +111,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     headers: init?.body ? { "Content-Type": "application/json" } : undefined,
     ...init,
   });
-  if (!res.ok) throw new Error(`API-Fehler ${res.status} bei ${path}`);
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error((body as { message?: string })?.message ?? `API-Fehler ${res.status} bei ${path}`);
+  }
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
 }
@@ -141,6 +144,16 @@ export const deleteAccount = (id: number) => request<void>(`/accounts/${id}`, { 
 
 export const addSnapshot = (id: number, body: { balance: number; equity: number; dailyPnl: number }) =>
   request<Snapshot>(`/accounts/${id}/snapshots`, { method: "POST", body: JSON.stringify(body) });
+
+export interface ImportSummary {
+  imported: number;
+  skipped: number;
+  from: string | null;
+  to: string | null;
+}
+
+export const importStatement = (id: number, format: "html" | "csv", content: string) =>
+  request<ImportSummary>(`/accounts/${id}/import`, { method: "POST", body: JSON.stringify({ format, content }) });
 
 export const addPayout = (id: number, body: { date: string; gross: number; splitPct: number; fees?: number; note?: string }) =>
   request<Payout>(`/accounts/${id}/payouts`, { method: "POST", body: JSON.stringify(body) });

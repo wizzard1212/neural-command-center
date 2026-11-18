@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Pencil, Trash2, CheckCircle2, XCircle, MinusCircle } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2, CheckCircle2, XCircle, MinusCircle, Upload } from "lucide-react";
 import { GlassCard } from "../components/ui/GlassCard";
 import { RingGauge } from "../components/accounts/RingGauge";
 import { TrafficLightDot } from "../components/accounts/TrafficLightDot";
@@ -12,7 +12,9 @@ import {
   addSnapshot,
   addPayout,
   deleteAccount,
+  importStatement,
   type Payout,
+  type ImportSummary,
 } from "../lib/accountsApi";
 
 const RING_COLORS = { green: "#00FF9D", yellow: "#FF7A1A", red: "#FF5A5A" } as const;
@@ -90,6 +92,69 @@ function SnapshotForm({ accountId }: { accountId: number }) {
       >
         Stand erfassen
       </button>
+    </div>
+  );
+}
+
+function StatementImport({ accountId }: { accountId: number }) {
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [result, setResult] = useState<ImportSummary | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const mutation = useMutation({
+    mutationFn: ({ format, content }: { format: "html" | "csv"; content: string }) =>
+      importStatement(accountId, format, content),
+    onSuccess: (res) => {
+      setResult(res);
+      setError(null);
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+    },
+    onError: (err) => {
+      setError((err as Error).message);
+      setResult(null);
+    },
+  });
+
+  const handleFile = async (file: File) => {
+    const format = file.name.toLowerCase().endsWith(".csv") ? "csv" : "html";
+    const content = await file.text();
+    mutation.mutate({ format, content });
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-text-faint text-xs">
+        MT5-Kontoauszug (Konto-Historie → „Bericht speichern unter" als HTML, oder „Export to CSV") statt
+        einzelner Tage auf einmal einlesen – keine Live-Verbindung nötig.
+      </p>
+      <div className="flex items-center gap-2">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".html,.htm,.csv"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) void handleFile(file);
+            e.target.value = "";
+          }}
+        />
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={mutation.isPending}
+          className="flex items-center gap-1.5 rounded-lg border border-cyan/30 px-3 py-1.5 text-xs text-cyan hover:bg-cyan/10 disabled:opacity-50"
+        >
+          <Upload size={13} /> {mutation.isPending ? "Importiert…" : "Kontoauszug importieren"}
+        </button>
+      </div>
+      {result && (
+        <p className="text-xs text-green">
+          {result.imported} Tag(e) importiert{result.skipped > 0 ? `, ${result.skipped} bereits vorhanden übersprungen` : ""}
+          {result.from && result.to ? ` (${result.from} bis ${result.to})` : ""}.
+        </p>
+      )}
+      {error && <p className="text-xs text-red">{error}</p>}
     </div>
   );
 }
@@ -283,6 +348,9 @@ export function AccountDetailPage() {
 
       <GlassCard title="Neuen Stand erfassen">
         <SnapshotForm accountId={account.id} />
+        <div className="border-t border-line mt-4 pt-4">
+          <StatementImport accountId={account.id} />
+        </div>
       </GlassCard>
 
       <GlassCard title="Auszahlungen">
