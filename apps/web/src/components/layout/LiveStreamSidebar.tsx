@@ -1,18 +1,22 @@
 import clsx from "clsx";
-import { PanelRightClose, PanelRightOpen, FilePlus, FileEdit, FileX } from "lucide-react";
+import { PanelRightClose, PanelRightOpen, FileEdit, Newspaper, LineChart, Landmark, Sunrise } from "lucide-react";
 import { useAppStore } from "../../store/useAppStore";
-import { useVaultStore } from "../../store/useVaultStore";
+import { useLiveStreamStore, type LiveStreamKind } from "../../store/useLiveStreamStore";
 
-const KIND_ICON = {
-  created: FilePlus,
-  modified: FileEdit,
-  deleted: FileX,
-} as const;
+const KIND_ICON: Record<LiveStreamKind, typeof FileEdit> = {
+  vault: FileEdit,
+  news: Newspaper,
+  trade: LineChart,
+  account: Landmark,
+  briefing: Sunrise,
+};
 
-const KIND_LABEL: Record<string, string> = {
-  created: "Neue Notiz",
-  modified: "Geändert",
-  deleted: "Gelöscht",
+const KIND_COLOR: Record<LiveStreamKind, string> = {
+  vault: "text-green",
+  news: "text-cyan",
+  trade: "text-violet-light",
+  account: "text-red",
+  briefing: "text-gold",
 };
 
 function timeAgo(ts: number): string {
@@ -27,7 +31,7 @@ function timeAgo(ts: number): string {
 export function LiveStreamSidebar() {
   const open = useAppStore((s) => s.liveStreamOpen);
   const toggle = useAppStore((s) => s.toggleLiveStream);
-  const events = useVaultStore((s) => s.recentEvents);
+  const entries = useLiveStreamStore((s) => s.entries);
 
   return (
     <aside
@@ -48,22 +52,23 @@ export function LiveStreamSidebar() {
       </div>
       {open && (
         <div className="overflow-y-auto h-[calc(100%-49px)]">
-          {events.length === 0 ? (
+          {entries.length === 0 ? (
             <div className="p-4 text-sm text-text-faint">
-              Noch keine Ereignisse. Ändere eine Notiz in Obsidian – sie erscheint hier und leuchtet im
-              Gehirn auf.
+              Noch keine Ereignisse. Neue News, Trades, Kontowarnungen und Vault-Änderungen erscheinen hier
+              live.
             </div>
           ) : (
             <ul className="divide-y divide-line">
-              {events.map((event, i) => {
-                const Icon = KIND_ICON[event.kind];
+              {entries.map((entry) => {
+                const Icon = KIND_ICON[entry.kind];
                 return (
-                  <li key={`${event.path}-${event.ts}-${i}`} className="flex items-start gap-2 px-3 py-2.5 text-xs">
-                    <Icon size={14} className="mt-0.5 text-green shrink-0" />
+                  <li key={entry.id} className="flex items-start gap-2 px-3 py-2.5 text-xs">
+                    <Icon size={14} className={clsx("mt-0.5 shrink-0", KIND_COLOR[entry.kind])} />
                     <div className="min-w-0">
-                      <div className="text-text truncate">{event.path.split("/").pop()}</div>
-                      <div className="text-text-faint">
-                        {KIND_LABEL[event.kind]} · {timeAgo(event.ts)}
+                      <div className="text-text truncate">{entry.label}</div>
+                      <div className="text-text-faint truncate">
+                        {entry.detail ? `${entry.detail} · ` : ""}
+                        {timeAgo(entry.ts)}
                       </div>
                     </div>
                   </li>

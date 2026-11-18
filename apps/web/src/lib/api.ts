@@ -50,3 +50,12 @@ export function putSetting<T>(key: string, value: T) {
     body: JSON.stringify({ value }),
   });
 }
+
+export interface AiUsageSummary {
+  monthToDateUsd: number;
+  budgetUsd: number;
+}
+
+export function fetchAiUsageSummary() {
+  return request<AiUsageSummary>("/ai-usage/summary");
+}

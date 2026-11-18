@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import type { ConnectionStatus, SourceKey, SourceStatus } from "@ncc/shared";
 import { env } from "./env.js";
+import { getFeedStatuses } from "../news/rssFetcher.js";
 
 function status(source: SourceKey, status: SourceStatus, message?: string): ConnectionStatus {
   return { source, status, lastCheckedAt: new Date().toISOString(), message };
@@ -24,9 +25,14 @@ export function computeConnectionStatuses(): ConnectionStatus[] {
     env.LUNARCRUSH_API_KEY,
     env.YOUTUBE_API_KEY,
   ].some((v) => v.trim().length > 0);
-  const feedsStatus = feedsConfigured
-    ? status("feeds", "connected")
-    : status("feeds", "disconnected", "Keine API-Schlüssel eingetragen. RSS-Feeds laufen trotzdem.");
+  const rssStatuses = Object.values(getFeedStatuses());
+  const anyRssConnected = rssStatuses.some((s) => s.status === "connected");
+  const feedsStatus =
+    feedsConfigured || anyRssConnected
+      ? status("feeds", "connected")
+      : rssStatuses.length > 0
+        ? status("feeds", "error", "Keine RSS-Quelle erreichbar und keine API-Schlüssel eingetragen.")
+        : status("feeds", "disconnected", "Noch kein Abruf gelaufen.");
 
   const kiStatus = env.ANTHROPIC_API_KEY
     ? status("ki", "connected")

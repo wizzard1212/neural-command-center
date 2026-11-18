@@ -4,7 +4,7 @@ Lokales Trading-Dashboard mit Morgen-Briefing, News-/Social-Feeds, Trading-Journ
 Funded-Konten-Übersicht und einem live aus dem Obsidian-Vault gespeisten 3D-„Gehirn".
 Basiert auf `SPEC.md` im Projektordner.
 
-**Aktueller Baustand:** Phase 4 (Trading-Journal) – siehe Abschnitt „Phasenplan" unten.
+**Aktueller Baustand:** Phase 5 (News-Feed) – siehe Abschnitt „Phasenplan" unten.
 
 ## Installation
 
@@ -83,7 +83,12 @@ lauffähig:
    Regel-Check, optionaler Claude-Vision-Screenshot-Analyse, Galerie-/Tabellen-
    Ansicht mit Filtern, Kalender-Heatmap, Statistik (Winrate, Profit-Faktor,
    Erwartungswert, Drawdown, Auswertung nach Setup/Session/Instrument/Emotion) ✅
-5. News-Feed
+5. **News-Feed** – RSS-Sammler (9 Quellen, config/feeds.json, einzeln an/aus
+   schaltbar), Duplikaterkennung mit Clustering ("X Quellen berichten"),
+   KI-Bewertung im Batch (Relevanz, Assets, Richtung, Kategorie, Zusammenfassung –
+   läuft automatisch sobald ein ANTHROPIC_API_KEY hinterlegt ist), 3-Spalten-
+   Oberfläche mit Filtern, "Zusammenhang erklären" und "Als Content-Idee merken",
+   KI-Kostenübersicht mit Monatsbudget in den Einstellungen ✅
 6. Morgen-Briefing
 7. Social-Feed
 8. Konten-Import (CSV/HTML-Export – MT5-Live-Anbindung bewusst nicht gebaut, da

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "forexlive",
+    "name": "ForexLive",
+    "url": "https://www.forexlive.com/feed/news",
+    "enabled": true
+  },
+  {
+    "id": "fxstreet",
+    "name": "FXStreet",
+    "url": "https://www.fxstreet.com/rss/news",
+    "enabled": true
+  },
+  {
+    "id": "investing",
+    "name": "Investing.com",
+    "url": "https://www.investing.com/rss/news.rss",
+    "enabled": true
+  },
+  {
+    "id": "coindesk",
+    "name": "CoinDesk",
+    "url": "https://www.coindesk.com/arc/outboundfeeds/rss/",
+    "enabled": true
+  },
+  {
+    "id": "cointelegraph",
+    "name": "Cointelegraph",
+    "url": "https://cointelegraph.com/rss",
+    "enabled": true
+  },
+  {
+    "id": "fed",
+    "name": "Fed-Pressemitteilungen",
+    "url": "https://www.federalreserve.gov/feeds/press_all.xml",
+    "enabled": true
+  },
+  {
+    "id": "ecb",
+    "name": "EZB-Pressemitteilungen",
+    "url": "https://www.ecb.europa.eu/rss/press.html",
+    "enabled": true
+  },
+  {
+    "id": "tagesschau",
+    "name": "tagesschau Wirtschaft",
+    "url": "https://www.tagesschau.de/wirtschaft/index~rss2.xml",
+    "enabled": true
+  },
+  {
+    "id": "handelsblatt",
+    "name": "Handelsblatt Schlagzeilen",
+    "url": "https://feeds.cms.handelsblatt.com/schlagzeilen",
+    "enabled": true
+  }
+]
