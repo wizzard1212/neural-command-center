@@ -5,6 +5,7 @@ import { GlassCard } from "../components/ui/GlassCard";
 import { FilterChips } from "../components/brain/FilterChips";
 import { NoteDetailPanel } from "../components/brain/NoteDetailPanel";
 import { BriefingCard } from "../components/briefing/BriefingCard";
+import { fetchHypeRadar } from "../lib/socialApi";
 
 // three.js/@react-three/* sind der größte Teil des Bundles – nur laden, wenn
 // die Zentrale wirklich besucht wird, statt bei jedem Seitenaufruf.
@@ -40,6 +41,7 @@ export function ZentralePage() {
     queryFn: fetchVaultStats,
     enabled: meta?.connected ?? false,
   });
+  const { data: hypeRadar } = useQuery({ queryKey: ["social", "hype-radar"], queryFn: fetchHypeRadar });
 
   const openTodoNodes = (graph?.nodes ?? [])
     .filter((n) => n.todosOpen > 0)
@@ -89,7 +91,20 @@ export function ZentralePage() {
         </GlassCard>
 
         <GlassCard className="col-span-12 lg:col-span-4" title="Top-Trends">
-          <p className="text-text-faint text-sm">Kommt in Phase 7 (Social-Feed, Hype-Radar).</p>
+          {!hypeRadar || hypeRadar.length === 0 ? (
+            <p className="text-text-faint text-sm">Noch keine Social-Daten gesammelt.</p>
+          ) : (
+            <ul className="flex flex-col gap-1.5">
+              {hypeRadar.map((t) => (
+                <li key={t.topic} className="flex items-center justify-between text-sm">
+                  <span className="font-mono-num text-text">{t.topic}</span>
+                  <span className="text-text-faint text-xs">
+                    {t.mentions24h}/24h · Z {t.zscore.toFixed(1)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </GlassCard>
 
         <GlassCard className="col-span-12 lg:col-span-4" title="Offene To-dos aus dem Vault">

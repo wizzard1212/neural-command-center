@@ -4,7 +4,7 @@ Lokales Trading-Dashboard mit Morgen-Briefing, News-/Social-Feeds, Trading-Journ
 Funded-Konten-Übersicht und einem live aus dem Obsidian-Vault gespeisten 3D-„Gehirn".
 Basiert auf `SPEC.md` im Projektordner.
 
-**Aktueller Baustand:** Phase 6 (Morgen-Briefing) – siehe Abschnitt „Phasenplan" unten.
+**Aktueller Baustand:** Phase 7 (Social-Feed) – siehe Abschnitt „Phasenplan" unten.
 
 ## Installation
 
@@ -98,7 +98,15 @@ lauffähig:
    die Rohdaten gespeichert), Speicherung in SQLite und als Vault-Notiz
    (`Vault/Dashboard/Briefings/`), Windows-Benachrichtigung + optionaler
    ntfy.sh-Push, kompakte Karte in der Zentrale mit Detail-Ansicht ✅
-7. Social-Feed
+7. **Social-Feed** – fünf Quellen hinter einer gemeinsamen `SocialSource`-
+   Schnittstelle (Reddit via OAuth, LunarCrush, CoinGecko Trending, Google
+   Trends als "experimentell" markiert, YouTube Data API), jede einzeln
+   fehlertolerant inkl. eines Prozess-weiten Schutzschalters gegen rohe
+   Socket-Fehler aus der inoffiziellen Google-Trends-Bibliothek; Hype-Radar
+   (Z-Score gegenüber 7-Tage-Schnitt) mit Sparkline, Sentiment-Barometer der
+   Watchlist als Halbkreis-Gauges mit Extremwert-Warnung, Plattform-Kacheln
+   mit Mini-Feed, KI-Hook-Idee-Generator + "Als Content-Idee merken" wie in
+   Phase 5, Social-Trends fließen zusätzlich ins Morgen-Briefing (Phase 6) ✅
 8. Konten-Import (CSV/HTML-Export – MT5-Live-Anbindung bewusst nicht gebaut, da
    Variante C „manuell/Import" gewählt wurde)
 9. Extras (Kalender, Wochen-Review, „Frag dein Gehirn", Backups)

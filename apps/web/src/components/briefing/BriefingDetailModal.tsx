@@ -100,6 +100,15 @@ export function BriefingDetailModal({ briefing, onClose }: { briefing: Briefing;
 
               <Section n={7} title="Social-Stimmung">
                 <p>{narrative.socialStimmung}</p>
+                {content?.socialTrends.available && (
+                  <ul className="mt-2 flex flex-col gap-1 text-xs text-text-faint">
+                    {content.socialTrends.data!.map((t) => (
+                      <li key={t.topic}>
+                        {t.topic}: Z-Score {t.zscore.toFixed(1)} ({t.mentions24h} Erwähnungen/24h)
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </Section>
 
               <Section n={8} title="Positionierung (COT)">

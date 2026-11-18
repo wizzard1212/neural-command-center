@@ -41,6 +41,9 @@ importers:
       fastify:
         specifier: ^5.1.0
         version: 5.12.8
+      google-trends-api:
+        specifier: ^4.9.2
+        version: 4.9.2
       gray-matter:
         specifier: ^4.0.3
         version: 4.0.3
@@ -1928,6 +1931,9 @@ packages:
 
   glsl-noise@0.0.0:
     resolution: {integrity: sha512-b/ZCF6amfAUb7dJM/MxRs7AetQEahYzJ8PtgfrmEdtw6uyGOr+ZSGtgjFm6mfsBkxJ4d2W7kg+Nlqzqvn3Bc0w==}
+
+  google-trends-api@4.9.2:
+    resolution: {integrity: sha512-gjVSHCM8B7LyAAUpXb4B0/TfnmpwQ2z1w/mQ2bL0AKpr2j3gLS1j2YOnifpfsGJRxAGXB/NoC+nGwC5qSnZIiA==}
 
   gopd@1.2.0:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
@@ -4355,6 +4361,8 @@ snapshots:
       is-glob: 4.0.3
 
   glsl-noise@0.0.0: {}
+
+  google-trends-api@4.9.2: {}
 
   gopd@1.2.0: {}
 

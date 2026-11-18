@@ -66,6 +66,12 @@ export interface OpenTradingTodo {
   text: string;
 }
 
+export interface SocialTrendSummary {
+  topic: string;
+  mentions24h: number;
+  zscore: number;
+}
+
 export interface BriefingContentJson {
   narrative: BriefingNarrative | null;
   prices: CollectResult<WatchlistQuote[]>;
@@ -74,6 +80,7 @@ export interface BriefingContentJson {
   riskRules: CollectResult<string>;
   openTodos: OpenTradingTodo[];
   accountsToday: AccountsTodaySummary;
+  socialTrends: CollectResult<SocialTrendSummary[]>;
   recentNews: unknown[];
   error?: string;
 }

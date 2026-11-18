@@ -11,6 +11,7 @@ import { listNewsItems } from "../news/repo.js";
 import { collectWatchlistPrices, collectEconomicCalendar, collectCotData } from "./priceCollector.js";
 import { collectRiskRulesFromVault, collectOpenTradingTodos } from "./vaultRules.js";
 import { collectAccountsToday } from "./accountsCollector.js";
+import { collectSocialTrends } from "./socialCollector.js";
 import { BRIEFING_TOOL, type BriefingNarrative } from "./schema.js";
 import { createBriefing } from "./repo.js";
 import { broadcast } from "../ws.js";
@@ -90,6 +91,7 @@ export async function generateBriefing(): Promise<{ status: "ok" | "partial" | "
   const riskRules = collectRiskRulesFromVault();
   const openTodos = collectOpenTradingTodos();
   const accountsToday = collectAccountsToday();
+  const socialTrends = collectSocialTrends();
 
   const since = new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString();
   const recentNews = listNewsItems({ from: since, limit: 100 })
@@ -97,7 +99,7 @@ export async function generateBriefing(): Promise<{ status: "ok" | "partial" | "
     .sort((a, b) => (b.relevance ?? 0) - (a.relevance ?? 0))
     .slice(0, 20);
 
-  const raw = { prices, calendar, cot, riskRules, openTodos, accountsToday, recentNews };
+  const raw = { prices, calendar, cot, riskRules, openTodos, accountsToday, socialTrends, recentNews };
 
   if (!env.ANTHROPIC_API_KEY) {
     // Ohne KI kein Fließtext-Briefing, aber die reinen Daten werden trotzdem
@@ -134,6 +136,11 @@ export async function generateBriefing(): Promise<{ status: "ok" | "partial" | "
       `COT-Daten: ${cot.available ? JSON.stringify(cot.data) : `nicht verfügbar (${cot.reason})`}`,
       `Merlins Risiko-Regeln aus dem Vault: ${riskRules.available ? riskRules.data : `nicht verfügbar (${riskRules.reason})`}`,
       `Offene Trading-To-dos: ${openTodos.map((t) => t.text).join("; ") || "keine"}`,
+      `Social-Trends der letzten 24h (Reddit/LunarCrush/CoinGecko/Trends/YouTube, stärkster Anstieg der Erwähnungen zuerst): ${
+        socialTrends.available
+          ? socialTrends.data!.map((t) => `${t.topic} (Z-Score ${t.zscore.toFixed(1)}, ${t.mentions24h} Erwähnungen/24h)`).join(", ")
+          : `nicht verfügbar (${socialTrends.reason})`
+      }`,
       `News der letzten 18h (bereits mit Relevanz 1-5 bewertet): ${JSON.stringify(
         recentNews.map((n) => ({ title: n.title, relevance: n.relevance, category: n.category, url: n.url, assets: n.assetsJson })),
       )}`,
